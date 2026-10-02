@@ -1,41 +1,147 @@
 # Conversa — Master Context
 
+## Complete Project Picture
+
+Conversa is a production-grade, WhatsApp-like real-time messaging platform built as a modular Spring Boot microservice monorepo. The long-term system supports 1-to-1 and group messaging, media sharing, push notifications, multi-device synchronization, presence, typing indicators, message lifecycle tracking, and end-to-end encryption concepts.
+
+The architecture is:
+
+- API Gateway as the external entry point.
+- user-service for users and authentication.
+- messaging-service for chat and real-time messaging.
+- media-service for media storage/upload concerns.
+- notification-service for push notifications.
+- PostgreSQL as primary persistent data storage.
+- Redis for ephemeral state such as presence/typing/sessions.
+- Kafka for event-driven decoupling and scalability.
+- Docker locally and Kubernetes as the deployment target.
+
+Locked non-functional goals include low-latency online delivery, horizontal scalability, at-least-once delivery with idempotency, secure-by-default handling, observability, testability, and cloud-native readiness.
+
 ## Project
 
 **Name:** Conversa
 
-Conversa is being built as a modular monorepo with independently deployable services and a shared development workflow.
+**Repository:** Mu-za-mil/conversa
 
-## Repository
+## Locked Architecture Decisions
 
-GitHub: Mu-za-mil/conversa
+- Java 21
+- Spring Boot 3.x (3.3+)
+- Monorepo
+- Spring Security + JWT; HS256 may be used initially and the design moves toward RS256
+- PostgreSQL + Spring Data JPA + Flyway
+- No `ddl-auto=update` after the authentication phase
+- WebSocket + STOMP for real-time messaging
+- Apache Kafka for event-driven messaging
+- Redis for ephemeral presence/typing/session state
+- Local filesystem first for media, then S3 + pre-signed URLs
+- Firebase Cloud Messaging for push notifications
+- Spring Cloud Gateway
+- Micrometer + Prometheus + OpenTelemetry for observability
+- JUnit 5, Mockito, and Testcontainers for testing
+- Docker + Docker Compose
+- Kubernetes for orchestration
+- GitHub Actions for CI/CD
 
-## Development Approach
+These decisions must not be changed without explicit approval.
 
-Development is incremental and feature-oriented. Each feature should be implemented as a complete vertical slice where practical, tested, reviewed, and merged into `develop`.
+## Coding Standards
 
-Git branch names describe the feature or engineering concern being implemented. Project phases are planning milestones, not branch names.
+- Package structure: controller → service → repository → domain.
+- DTOs at boundaries; MapStruct is preferred.
+- No business logic in controllers.
+- Public endpoints will be documented with OpenAPI when endpoints are introduced.
+- Tests are required for significant service methods/core logic.
+- Secrets are provided through environment variables.
+- Development uses feature-oriented Git branches; phase numbers are planning milestones, never branch names.
 
-## Initial Service Areas
+## Current Phase
 
-- user-service
-- messaging-service
-- media-service
-- notification-service
-- api-gateway
+**Phase 0 — Foundation**
 
-## Repository Areas
+**Branch:** `feature/project-foundation`
 
-- `docs/` — project and engineering documentation
-- `services/` — application services
-- `infra/` — infrastructure configuration
-- `scripts/` — development/automation scripts
-- `.github/workflows/` — CI/CD automation
+### Phase 0 Scope
 
-## Current Development Branch
+- Bootable Spring Boot 3.x / Java 21 projects for:
+  - user-service
+  - messaging-service
+  - media-service
+  - notification-service
+  - api-gateway
+- Local Docker Compose infrastructure:
+  - PostgreSQL
+  - Redis
+  - Kafka
+  - Zookeeper
+- Repository .gitignore, .env.example, README
+- Bootstrapping/context-load tests for each service
+- Infrastructure startup verification where Docker is available
 
-`feature/project-foundation`
+### Explicitly Out of Scope for Phase 0
 
-## Source of Truth
+- Business logic
+- Entities
+- Database schemas/Flyway migrations
+- Authentication or JWT
+- Security configuration
+- WebSockets
+- Kafka producers/consumers
+- Media storage
+- Notifications
+- Gateway routing/security behavior
+- Observability implementation
+- CI/CD
 
-The uploaded Conversa/SignalChat project description supplied for this project remains the source of truth for the product architecture, planned capabilities, and implementation sequence. This repository intentionally uses **Conversa** as the project name.
+## Current Status
+
+Phase 0 implementation is present on `feature/project-foundation`.
+
+Implemented:
+- Five Spring Boot service shells using Java 21.
+- Maven build configuration for each service.
+- Context-load tests for each service.
+- Local PostgreSQL, Redis, Kafka, and Zookeeper Compose definition.
+- Environment example, repository ignore rules, and Phase 0 README.
+- Feature-based branching documentation.
+
+## Verification Status
+
+Repository structure and source configuration were inspected successfully.
+
+Docker runtime verification is **pending** because the current execution environment does not provide a Docker CLI/daemon. It must be completed locally with:
+
+```bash
+cp .env.example .env
+docker compose config
+docker compose up -d
+docker compose ps
+docker compose down
+```
+
+Each service should also be verified locally with `mvn test` from its service directory.
+
+## Completed Phases
+
+- Phase 0 — Foundation: implementation complete; runtime verification pending local Docker availability.
+
+## Open Issues / Technical Debt
+
+- Docker Compose startup has not been executed in this environment.
+- Maven builds/tests have not been executed in this environment because the repository cannot be cloned into the current execution environment.
+- Maven wrapper files are not yet included; local Maven 3.9+ is currently expected.
+- The Kafka/Zookeeper Compose setup is intentionally local-development-only and uses a single broker with plaintext listeners.
+
+## Next Phase
+
+Phase 1 — User Service + Auth Foundation, after Phase 0 is verified and merged.
+
+## Session Handoff Notes
+
+- Current branch: `feature/project-foundation`.
+- Five independent Spring Boot 3.5.6 / Java 21 service shells exist with context-load tests.
+- Service ports are 8080–8084: gateway, user, messaging, media, notification respectively.
+- Docker Compose defines PostgreSQL 16, Redis 7, Confluent Kafka 7.7.1, and Confluent Zookeeper 7.7.1.
+- No Phase 1 business/auth/security functionality was introduced.
+- Before moving to the next feature, run all five Maven tests and start/stop the Compose infrastructure locally.
