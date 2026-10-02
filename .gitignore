@@ -1,26 +1,36 @@
-# OS
-.DS_Store
-Thumbs.db
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+!gradle-wrapper.jar
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
 
 # IDE
 .idea/
 .vscode/
 *.iml
+.classpath
+.project
+.settings/
 
-# Environment
-.env
-.env.*
-!.env.example
+# OS
+.DS_Store
+Thumbs.db
 
-# Logs
+# Logs / runtime
 *.log
-
-# Build output
-dist/
-build/
-target/
-node_modules/
-
-# Runtime
+*.pid
 coverage/
 tmp/
+
+# Build / generated
+build/
+out/
+
+# Docker local overrides
+docker-compose.override.yml
