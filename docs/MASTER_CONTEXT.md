@@ -58,7 +58,7 @@ These decisions must not be changed without explicit approval.
 
 ## Current Phase
 
-**Phase 0 — Foundation**
+**Phase 0 — Foundation (completed)**
 
 **Branch:** `feature/project-foundation`
 
@@ -110,7 +110,7 @@ Implemented:
 
 Repository structure and source configuration were inspected successfully.
 
-Docker runtime verification is **pending** because the current execution environment does not provide a Docker CLI/daemon. It must be completed locally with:
+Docker runtime verification has been completed locally by the developer. The repository's Docker Compose configuration starts successfully with PostgreSQL, Redis, Kafka, and Zookeeper.
 
 ```bash
 cp .env.example .env
@@ -124,18 +124,18 @@ Each service should also be verified locally with `mvn test` from its service di
 
 ## Completed Phases
 
-- Phase 0 — Foundation: implementation complete; runtime verification pending local Docker availability.
+- Phase 0 — Foundation: implementation and local verification complete.
 
 ## Open Issues / Technical Debt
 
-- Docker Compose startup has not been executed in this environment.
-- Maven builds/tests have not been executed in this environment because the repository cannot be cloned into the current execution environment.
+- Docker Compose startup was verified locally.
+- All five Maven test suites were verified locally.
 - Maven wrapper files are not yet included; local Maven 3.9+ is currently expected.
 - The Kafka/Zookeeper Compose setup is intentionally local-development-only and uses a single broker with plaintext listeners.
 
 ## Next Phase
 
-Phase 1 — User Service + Auth Foundation, after Phase 0 is verified and merged.
+Phase 1 — User Service + Auth Foundation, starting from `develop` after the Phase 0 pull request is merged.
 
 ## Session Handoff Notes
 
@@ -144,4 +144,5 @@ Phase 1 — User Service + Auth Foundation, after Phase 0 is verified and merged
 - Service ports are 8080–8084: gateway, user, messaging, media, notification respectively.
 - Docker Compose defines PostgreSQL 16, Redis 7, Confluent Kafka 7.7.1, and Confluent Zookeeper 7.7.1.
 - No Phase 1 business/auth/security functionality was introduced.
-- Before moving to the next feature, run all five Maven tests and start/stop the Compose infrastructure locally.
+- Phase 0 local verification passed: Docker Compose infrastructure started successfully and all five Maven test suites passed.
+- The Phase 0 pull request should be merged into `develop` before starting the next feature branch.
