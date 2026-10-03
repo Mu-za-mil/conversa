@@ -58,9 +58,9 @@ These decisions must not be changed without explicit approval.
 
 ## Current Phase
 
-**Phase 0 — Foundation (completed)**
+**Phase 1 — User Service + Auth Foundation**
 
-**Branch:** `feature/project-foundation`
+**Branch:** `feature/user-authentication`
 
 ### Phase 0 Scope
 
@@ -96,7 +96,7 @@ These decisions must not be changed without explicit approval.
 
 ## Current Status
 
-Phase 0 implementation is present on `feature/project-foundation`.
+Phase 0 is merged into `develop`. Phase 1 implementation is in progress on `feature/user-authentication`.
 
 Implemented:
 - Five Spring Boot service shells using Java 21.
@@ -135,11 +135,18 @@ Each service should also be verified locally with `mvn test` from its service di
 
 ## Next Phase
 
-Phase 1 — User Service + Auth Foundation, starting from `develop` after the Phase 0 pull request is merged.
+Phase 2 — Roles, Account Status, and Security Hardening, after Phase 1 is verified and merged.
 
 ## Session Handoff Notes
 
-- Current branch: `feature/project-foundation`.
+- Current branch: `feature/user-authentication`.
+- Phase 1 implementation includes the User entity, Flyway migration, repository uniqueness checks, registration, login, BCrypt password hashing, CustomUserDetailsService, HS256-compatible JWT access/refresh tokens, public authentication endpoints, JWT request filtering, and global authentication/validation error handling.
+- Roles, account status, email verification, multi-device, Redis refresh-token storage, Actuator, WebSockets, Kafka, and gateway security remain out of scope for this phase.
+- User-service now uses PostgreSQL through Spring Data JPA with Flyway and `ddl-auto=validate`.
+- JWT secret is required from `JWT_SECRET`; it is not committed as a real secret.
+- Testcontainers PostgreSQL integration coverage was added for registration, duplicate usernames, and invalid credentials.
+- Local Maven/Testcontainers verification is still required before opening the Phase 1 pull request.
+
 - Five independent Spring Boot 3.5.6 / Java 21 service shells exist with context-load tests.
 - Service ports are 8080–8084: gateway, user, messaging, media, notification respectively.
 - Docker Compose defines PostgreSQL 16, Redis 7, Confluent Kafka 7.7.1, and Confluent Zookeeper 7.7.1.
