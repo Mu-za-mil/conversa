@@ -10,7 +10,7 @@ import io.jsonwebtoken.*; import io.jsonwebtoken.security.Keys; import org.sprin
  public String refreshToken(UserDetails user){return create(user.getUsername(),refreshSeconds,"refresh");}
  private String create(String subject,long seconds,String type){Instant now=Instant.now();return Jwts.builder().subject(subject).claim("type",type).issuedAt(Date.from(now)).expiration(Date.from(now.plusSeconds(seconds))).signWith(key).compact();}
  public String username(String token){return parse(token).getPayload().getSubject();}
- public boolean isRefreshToken(String token){return "refresh".equals(parse(token).getPayload().get("type",String.class));}
+ public boolean isRefreshToken(String token){try{return "refresh".equals(parse(token).getPayload().get("type",String.class));}catch(JwtException|IllegalArgumentException e){return false;}}
  public boolean isValid(String token,UserDetails user){try{return username(token).equals(user.getUsername())&&!parse(token).getPayload().getExpiration().before(new Date());}catch(JwtException|IllegalArgumentException e){return false;}}
  private Jws<Claims> parse(String token){return Jwts.parser().verifyWith(key).build().parseSignedClaims(token);}
 }
