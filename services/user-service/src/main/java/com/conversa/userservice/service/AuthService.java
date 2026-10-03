@@ -1,0 +1,10 @@
+package com.conversa.userservice.service;
+import com.conversa.userservice.domain.User; import com.conversa.userservice.dto.*; import com.conversa.userservice.repository.UserRepository; import org.springframework.security.authentication.AuthenticationManager; import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; import org.springframework.security.core.userdetails.UserDetails; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional;
+@Service public class AuthService {
+ private final UserRepository users; private final PasswordEncoder encoder; private final AuthenticationManager authenticationManager; private final CustomUserDetailsService details; private final JwtService jwt;
+ public AuthService(UserRepository users,PasswordEncoder encoder,AuthenticationManager authenticationManager,CustomUserDetailsService details,JwtService jwt){this.users=users;this.encoder=encoder;this.authenticationManager=authenticationManager;this.details=details;this.jwt=jwt;}
+ @Transactional public void register(RegisterRequest r){if(users.existsByUsername(r.username())) throw new ConflictException("Username already exists"); if(users.existsByEmail(r.email())) throw new ConflictException("Email already exists"); users.save(new User(r.username(),r.email(),encoder.encode(r.password())));}
+ public TokenResponse login(LoginRequest r){authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(r.username(),r.password()));UserDetails u=details.loadUserByUsername(r.username());return tokens(u);}
+ public TokenResponse refresh(String token){if(!jwt.isRefreshToken(token)) throw new UnauthorizedException("Invalid refresh token"); UserDetails u=details.loadUserByUsername(jwt.username(token)); if(!jwt.isValid(token,u)) throw new UnauthorizedException("Invalid refresh token"); return tokens(u);}
+ private TokenResponse tokens(UserDetails u){return new TokenResponse(jwt.accessToken(u),jwt.refreshToken(u),"Bearer");}
+}
