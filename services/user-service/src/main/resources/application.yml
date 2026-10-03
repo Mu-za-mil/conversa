@@ -15,6 +15,6 @@ server:
   port: 8081
 security:
   jwt:
-    secret: ${JWT_SECRET:change-this-development-secret-to-at-least-32-bytes}
+    secret: ${JWT_SECRET}
     access-expiration-seconds: ${JWT_ACCESS_EXPIRATION_SECONDS:900}
     refresh-expiration-seconds: ${JWT_REFRESH_EXPIRATION_SECONDS:604800}
